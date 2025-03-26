@@ -41,20 +41,39 @@ CLASS zcl_coa_4_oop IMPLEMENTATION.
     "shorter syntax
     ls_person = VALUE zst_coa_person( firstname = |John|
                                       lastname = |Doe|
-                                      "dateofbirth = |19800101|
+                                      dateofbirth = |19800101|
                                       job       = |Mechanic|
                                       address = VALUE zst_coa_address( city = |Kigali|
-                                                                       "postalcode = 55555
+                                                                       postalcode = 55555
                                                                        country = |Rwanda|
                                                                      )
                                      ).
 
+*     out->write( ls_person ).
+
     DATA(lo_person) = NEW zcl_coa_4_person( ).
+
+    "old syntax
+*    data lo_person1 type ref to zcl_coa_4_person.
+*    create object lo_person1.
+
     lo_person->set_person( EXPORTING is_person = ls_person ).
 
+    "lo_person->get_person( RECEIVING rs_person = DATA(ls_person2) ).
     "data(ls_person2) = lo_person->get_person( ).
-    lo_person->get_person( RECEIVING rs_person = DATA(ls_person2) ).
 
+    lo_person->get_full_name( IMPORTING ev_full_name = data(lv_full_name) ).
+    out->write( lv_full_name ).
+
+    "RETURNING -> RECEIVING
+    "IMPORTING -> EXPORTING
+    "EXPORTING -> IMPORTING
+    "CHANGING -> CHANGING
+
+    data(lv_full_name_1) = |This is my full name|.
+    lo_person->add_full_name(  CHANGING cv_full_name = lv_full_name_1 ).
+
+    out->write( lv_full_name_1 ).
 
   ENDMETHOD.
 ENDCLASS.
