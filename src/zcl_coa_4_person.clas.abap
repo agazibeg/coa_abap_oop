@@ -19,9 +19,17 @@ CLASS zcl_coa_4_person DEFINITION
 
     METHODS set_job IMPORTING iv_job TYPE string.
 
-    METHODS get_full_name EXPORTING ev_full_name type string.
+    METHODS get_full_name EXPORTING ev_full_name TYPE string.
 
-    methods add_full_name changing cv_full_name type string.
+    METHODS add_full_name CHANGING cv_full_name TYPE string.
+
+    METHODS constructor IMPORTING is_person TYPE zst_coa_person.
+
+    CLASS-METHODS get_nr_persons RETURNING VALUE(rv_nr_persons) TYPE i.
+
+    "methods get_local_class_instance returning value(ro_local_class) type ref to .
+
+    class-data mt_persons type table of zst_coa_person.
 
   PROTECTED SECTION.
 *    DATA mv_firstname   TYPE string.
@@ -30,6 +38,8 @@ CLASS zcl_coa_4_person DEFINITION
 *    DATA mv_job         TYPE string.
 *    DATA mv_address     TYPE string.
     DATA ms_person TYPE zst_coa_person.
+
+    CLASS-DATA mv_nr_persons TYPE i.
 
   PRIVATE SECTION.
 
@@ -69,11 +79,29 @@ CLASS zcl_coa_4_person IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD get_full_name.
-    ev_full_name = |{ ms_person-firstname } { ms_person-lastname }|.
+    "ev_full_name = |{ ms_person-firstname } { ms_person-lastname }|.
+
+    ev_full_name = lcl_person_helper=>get_full_name( exporting iv_firstname = conv #( ms_person-firstname )
+                                                               iv_lastname  = conv #( ms_person-lastname ) ).
+
+    "data(lo_local_class) = new lcl_person_helper(  ).
+    "data(lv_string) = lo_local_class->get_some_string(  ).
+
   ENDMETHOD.
 
   METHOD add_full_name.
     cv_full_name = |{ cv_full_name }: { ms_person-firstname } { ms_person-lastname }|.
+  ENDMETHOD.
+
+  METHOD constructor.
+    ms_person = is_person. "instance
+
+    append ms_person to mt_persons. "static
+    mv_nr_persons = mv_nr_persons + 1. "static
+  ENDMETHOD.
+
+  METHOD get_nr_persons.
+    rv_nr_persons = mv_nr_persons.
   ENDMETHOD.
 
 ENDCLASS.
